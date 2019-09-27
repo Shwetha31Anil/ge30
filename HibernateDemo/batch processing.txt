@@ -1,0 +1,31 @@
+ public void addEmployees( ){
+      Session session = factory.openSession();
+      Transaction tx = null;
+      Integer employeeID = null;
+      
+      try {
+         tx = session.beginTransaction();
+         for ( int i=0; i<100000; i++ ) {
+            String fname = "First Name " + i;
+            String lname = "Last Name " + i;
+            Integer salary = i;
+            Employee employee = new Employee(fname, lname, salary);
+            session.save(employee);
+         	if( i % 50 == 0 ) {
+               session.flush();
+               session.clear();
+            }
+         }
+         tx.commit();
+      } catch (HibernateException e) {
+         if (tx!=null) tx.rollback();
+         e.printStackTrace(); 
+      } finally {
+         session.close(); 
+      }
+      return ;
+   }
+   
+    <property name = "hibernate.jdbc.batch_size">
+         50
+      </property>
